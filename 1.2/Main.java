@@ -1,4 +1,13 @@
+/**
+ * This is the main class for the application.
+ */
 public class Main {
+  /**
+   * The main method for the application.
+   * It starts two threads, T1 and T2, and stops them after a delay.
+   *
+   * @param args command-line arguments for the application
+   */
   public static void main(String[] args) {
     T1 t1 = new T1();
     t1.start();
