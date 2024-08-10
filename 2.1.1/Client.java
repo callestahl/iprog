@@ -7,10 +7,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Client {
+public class Client implements MessageObserver{
 
   private String host = "127.0.0.1";
   private int port = 2000;
+  private PrintWriter out = null;
 
   public static void main(String[] args) {
     Client client = new Client();
@@ -59,9 +60,9 @@ public class Client {
       System.exit(1);
     }
 
-    PrintWriter out = null;
+    
     try {
-      out = new PrintWriter(
+      client.out = new PrintWriter(
           new OutputStreamWriter(socket.getOutputStream(), "ISO-8859-1"),
           true);
     } catch (UnsupportedEncodingException e) {
@@ -72,14 +73,23 @@ public class Client {
       System.exit(1);
     }
 
+    GUI gui = new GUI();
+    gui.addObserver(client);
+    gui.setVisible(true);
+
     while (true) {
       String message = null;
       try {
         message = in.readLine();
       } catch (IOException e) { }
-      if (message != null) {
-        System.out.println(message);
+      if (message != null && !message.isEmpty()) {
+        gui.addMessage(message);
       }
     }
+  }
+
+  @Override
+  public void messageSent(String message) {
+    out.println(message);
   }
 }
