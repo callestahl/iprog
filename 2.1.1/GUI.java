@@ -14,7 +14,6 @@ public class GUI extends JFrame implements MessageObservable {
     private JButton sendButton;
 
     public GUI() {
-        setTitle("Client");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
