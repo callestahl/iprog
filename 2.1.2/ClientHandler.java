@@ -5,13 +5,17 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ClientHandler implements Runnable {
+public class ClientHandler implements Runnable, MessageObservable {
 
   private boolean running = true;
   private Socket socket = null;
   private BufferedReader in = null;
   private PrintWriter out = null;
+
+  List<MessageObserver> observers = new ArrayList<MessageObserver>();
 
   public ClientHandler(Socket socket) {
     this.socket = socket;
@@ -53,5 +57,22 @@ public class ClientHandler implements Runnable {
         running = false;
       }
     }
+    ClientHandlerMessage message = new ClientHandlerMessage();
+    message.setSender(this);
+    message.setMessage(null);
+    message.setMessageType(MessageType.DISCONNECTED);
+    notifyObservers(message);
+  }
+
+  @Override
+  public void notifyObservers(ClientHandlerMessage message) {
+    for (MessageObserver observer : observers) {
+      observer.messageSent(message);
+    }
+  }
+
+  @Override
+  public void addObserver(MessageObserver observer) {
+    observers.add(observer);
   }
 }

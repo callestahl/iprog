@@ -1,4 +1,4 @@
 public interface MessageObservable {
-  void notifyObservers();
+  void notifyObservers(ClientHandlerMessage message);
   void addObserver(MessageObserver observer);
 }

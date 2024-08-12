@@ -1,3 +1,3 @@
 public interface MessageObserver {
-  void messageSent(String message);
+  void messageSent(ClientHandlerMessage message);
 }

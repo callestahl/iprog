@@ -3,11 +3,10 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-
-public class Server {
+public class Server implements MessageObserver {
 
   private int port = 2000;
   ServerSocket socket = null;
@@ -24,6 +23,7 @@ public class Server {
         ClientHandler client = new ClientHandler(clientSocket);
         new Thread(client).start();
         clients.add(client);
+        client.addObserver(this);
       } catch (IOException e) {
         System.err.println(e.getMessage());
       }
@@ -69,6 +69,19 @@ public class Server {
         ", connected clients: " +
         server.clients.size()
       );
+    }
+  }
+
+  @Override
+  public synchronized void messageSent(
+    ClientHandlerMessage message
+  ) {
+    if (message.getMessageType() == MessageType.DISCONNECTED) {
+      clients.remove(message.getSender());
+    } else if (
+      message.getMessageType() == MessageType.MESSAGE
+    ) {
+
     }
   }
 }
