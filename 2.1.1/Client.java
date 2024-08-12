@@ -19,7 +19,7 @@ public class Client implements MessageObserver {
   GUI gui = null;
 
   public static void main(String[] args) {
-    Client client = new Client();
+    ClientHandler client = new ClientHandler();
     switch (args.length) {
       case 0 -> {}
       case 1 -> client.host = args[0];

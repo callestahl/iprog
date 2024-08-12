@@ -1,18 +1,34 @@
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+
 
 public class Server {
 
   private int port = 2000;
   ServerSocket socket = null;
-  String hostName = null;
+  String hostName = "unknown";
   GUI gui = null;
+  private volatile boolean listening = true;
 
-  List<Client> clients = new ArrayList<Client>();
+  volatile List<ClientHandler> clients = new ArrayList<ClientHandler>();
+
+  private void listen() {
+    while (listening) {
+      try {
+        Socket clientSocket = socket.accept();
+        ClientHandler client = new ClientHandler(clientSocket);
+        new Thread(client).start();
+        clients.add(client);
+      } catch (IOException e) {
+        System.err.println(e.getMessage());
+      }
+    }
+  }
 
   public static void main(String[] args) {
     Server server = new Server();
@@ -43,7 +59,7 @@ public class Server {
       System.err.println(e.getMessage());
       System.exit(1);
     }
-
+    new Thread(() -> server.listen()).start();
     while (true) {
       server.gui.setTitle(
         "Host: " +

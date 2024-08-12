@@ -3,7 +3,7 @@
  */
 public class T2 implements Runnable {
 
-  private boolean shouldStop = false;
+  private volatile boolean shouldStop = false;
 
   /**
    * The run method is called when the Runnable is used to create a Thread and the
