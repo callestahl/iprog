@@ -86,7 +86,6 @@ public class Client implements MessageObserver {
       Integer.toString(client.port)
     );
     client.gui.addObserver(client);
-    client.gui.setVisible(true);
 
     new Thread(() -> {
       while (true) {

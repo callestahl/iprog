@@ -44,6 +44,8 @@ public class GUI extends JFrame implements MessageObservable {
                 }
             }
         });
+
+        setVisible(true);
     }
 
     public void addMessage(String message) {
