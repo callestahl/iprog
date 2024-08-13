@@ -45,6 +45,20 @@ public class ClientHandler implements Runnable, MessageObservable {
     name = socket.getInetAddress().getHostAddress();
   }
 
+  public void closeConnections() {
+    try {
+      in.close();
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+    }
+    out.close();
+    try {
+      socket.close();
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+    }
+  }
+
   @Override
   public void run() {
     notifyObservers(

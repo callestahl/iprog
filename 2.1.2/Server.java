@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Server implements MessageObserver {
 
@@ -53,6 +55,23 @@ public class Server implements MessageObserver {
     }
 
     server.gui = new GUI();
+    server.gui.addWindowListener(
+      new WindowAdapter() {
+        @Override
+        public synchronized void windowClosing(WindowEvent e) {
+          server.listening = false;
+          for (ClientHandler clientHandler : server.clients) {
+            clientHandler.writeMessage("Server shutting down");
+            clientHandler.closeConnections();
+          }
+          try {
+            server.socket.close();
+          } catch (IOException e1) {
+            System.err.println(e1.getMessage());
+          }
+        }
+      }
+    );
     try {
       InetAddress.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
