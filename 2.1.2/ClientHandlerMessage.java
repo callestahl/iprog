@@ -4,6 +4,16 @@ public class ClientHandlerMessage {
   private MessageType messageType;
   private ClientHandler sender;
 
+  public ClientHandlerMessage(
+    ClientHandler sender,
+    String message,
+    MessageType messageType
+  ) {
+    this.sender = sender;
+    this.message = message;
+    this.messageType = messageType;
+  }
+
   public ClientHandler getSender() {
     return this.sender;
   }

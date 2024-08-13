@@ -47,11 +47,13 @@ public class ClientHandler implements Runnable, MessageObservable {
 
   @Override
   public void run() {
-    ClientHandlerMessage clientHandlerMessage = new ClientHandlerMessage();
-    clientHandlerMessage.setMessage(" connected to the server");
-    clientHandlerMessage.setMessageType(MessageType.MESSAGE);
-    clientHandlerMessage.setSender(this);
-    notifyObservers(clientHandlerMessage);
+    notifyObservers(
+      new ClientHandlerMessage(
+        this,
+        " connected to the server",
+        MessageType.MESSAGE
+      )
+    );
 
     while (running) {
       String message;
@@ -60,21 +62,21 @@ public class ClientHandler implements Runnable, MessageObservable {
         if (message == null) {
           running = false;
         } else if (!message.isBlank()) {
-          clientHandlerMessage = new ClientHandlerMessage();
-          clientHandlerMessage.setMessage(message);
-          clientHandlerMessage.setMessageType(MessageType.MESSAGE);
-          clientHandlerMessage.setSender(this);
-          notifyObservers(clientHandlerMessage);
+          notifyObservers(
+            new ClientHandlerMessage(this, message, MessageType.MESSAGE)
+          );
         }
       } catch (IOException e) {
         running = false;
       }
     }
-    clientHandlerMessage = new ClientHandlerMessage();
-    clientHandlerMessage.setSender(this);
-    clientHandlerMessage.setMessage(" disconnected from the server");
-    clientHandlerMessage.setMessageType(MessageType.DISCONNECTED);
-    notifyObservers(clientHandlerMessage);
+    notifyObservers(
+      new ClientHandlerMessage(
+        this,
+        " disconnected from the server",
+        MessageType.DISCONNECTED
+      )
+    );
   }
 
   @Override
