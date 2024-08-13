@@ -14,13 +14,15 @@ public class ClientHandler implements Runnable, MessageObservable {
   private Socket socket = null;
   private BufferedReader in = null;
   private PrintWriter out = null;
+  private String name = null;
 
   List<MessageObserver> observers = new ArrayList<MessageObserver>();
 
   public ClientHandler(Socket socket) {
     this.socket = socket;
     try {
-      in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      in =
+        new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
     } catch (IOException e) {
       System.err.println(e.getMessage());
       System.exit(1);
@@ -39,29 +41,40 @@ public class ClientHandler implements Runnable, MessageObservable {
       System.err.println(e.getMessage());
       System.exit(1);
     }
+
+    name = socket.getInetAddress().getHostAddress();
   }
 
   @Override
   public void run() {
+    ClientHandlerMessage clientHandlerMessage = new ClientHandlerMessage();
+    clientHandlerMessage.setMessage(" connected to the server");
+    clientHandlerMessage.setMessageType(MessageType.MESSAGE);
+    clientHandlerMessage.setSender(this);
+    notifyObservers(clientHandlerMessage);
+
     while (running) {
       String message;
       try {
         message = in.readLine();
         if (message == null) {
           running = false;
-        }
-        else if (!message.isBlank()) {
-          System.out.println(message);
+        } else if (!message.isBlank()) {
+          clientHandlerMessage = new ClientHandlerMessage();
+          clientHandlerMessage.setMessage(message);
+          clientHandlerMessage.setMessageType(MessageType.MESSAGE);
+          clientHandlerMessage.setSender(this);
+          notifyObservers(clientHandlerMessage);
         }
       } catch (IOException e) {
         running = false;
       }
     }
-    ClientHandlerMessage message = new ClientHandlerMessage();
-    message.setSender(this);
-    message.setMessage(null);
-    message.setMessageType(MessageType.DISCONNECTED);
-    notifyObservers(message);
+    clientHandlerMessage = new ClientHandlerMessage();
+    clientHandlerMessage.setSender(this);
+    clientHandlerMessage.setMessage(" disconnected from the server");
+    clientHandlerMessage.setMessageType(MessageType.DISCONNECTED);
+    notifyObservers(clientHandlerMessage);
   }
 
   @Override
@@ -74,5 +87,61 @@ public class ClientHandler implements Runnable, MessageObservable {
   @Override
   public void addObserver(MessageObserver observer) {
     observers.add(observer);
+  }
+
+  public void writeMessage(String message) {
+    out.println(message);
+  }
+
+  public boolean isRunning() {
+    return this.running;
+  }
+
+  public boolean getRunning() {
+    return this.running;
+  }
+
+  public void setRunning(boolean running) {
+    this.running = running;
+  }
+
+  public Socket getSocket() {
+    return this.socket;
+  }
+
+  public void setSocket(Socket socket) {
+    this.socket = socket;
+  }
+
+  public BufferedReader getIn() {
+    return this.in;
+  }
+
+  public void setIn(BufferedReader in) {
+    this.in = in;
+  }
+
+  public PrintWriter getOut() {
+    return this.out;
+  }
+
+  public void setOut(PrintWriter out) {
+    this.out = out;
+  }
+
+  public String getName() {
+    return this.name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public List<MessageObserver> getObservers() {
+    return this.observers;
+  }
+
+  public void setObservers(List<MessageObserver> observers) {
+    this.observers = observers;
   }
 }

@@ -15,9 +15,6 @@ public class GUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(messageList);
         add(scrollPane, BorderLayout.CENTER);
 
-        JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new BorderLayout());
-
         setVisible(true);
     }
 

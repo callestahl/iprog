@@ -12,7 +12,7 @@ public class Server implements MessageObserver {
   ServerSocket socket = null;
   String hostName = "unknown";
   GUI gui = null;
-  private volatile boolean listening = true;
+  private boolean listening = true;
 
   volatile List<ClientHandler> clients = new ArrayList<ClientHandler>();
 
@@ -59,6 +59,13 @@ public class Server implements MessageObserver {
       System.err.println(e.getMessage());
       System.exit(1);
     }
+
+    try {
+      server.hostName = InetAddress.getLocalHost().getHostAddress();
+    } catch (UnknownHostException e) {
+      System.err.println(e.getMessage());
+    }
+
     new Thread(() -> server.listen()).start();
     while (true) {
       server.gui.setTitle(
@@ -73,15 +80,15 @@ public class Server implements MessageObserver {
   }
 
   @Override
-  public synchronized void messageSent(
-    ClientHandlerMessage message
-  ) {
+  public synchronized void messageSent(ClientHandlerMessage message) {
     if (message.getMessageType() == MessageType.DISCONNECTED) {
       clients.remove(message.getSender());
-    } else if (
-      message.getMessageType() == MessageType.MESSAGE
-    ) {
-
+    }
+    gui.addMessage(message.getSender().getName() + ": " + message.getMessage());
+    for (ClientHandler clientHandler : clients) {
+      clientHandler.writeMessage(
+        message.getSender().getName() + ": " + message.getMessage()
+      );
     }
   }
 }
