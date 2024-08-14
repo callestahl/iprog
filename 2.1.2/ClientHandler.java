@@ -46,12 +46,17 @@ public class ClientHandler implements Runnable, MessageObservable {
   }
 
   public void closeConnections() {
+    running = false;
+    try {
+      out.close();
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
     try {
       in.close();
     } catch (IOException e) {
       System.err.println(e.getMessage());
     }
-    out.close();
     try {
       socket.close();
     } catch (IOException e) {
@@ -94,14 +99,14 @@ public class ClientHandler implements Runnable, MessageObservable {
   }
 
   @Override
-  public void notifyObservers(ClientHandlerMessage message) {
+  public synchronized void notifyObservers(ClientHandlerMessage message) {
     for (MessageObserver observer : observers) {
       observer.messageSent(message);
     }
   }
 
   @Override
-  public void addObserver(MessageObserver observer) {
+  public synchronized void addObserver(MessageObserver observer) {
     observers.add(observer);
   }
 
@@ -109,55 +114,7 @@ public class ClientHandler implements Runnable, MessageObservable {
     out.println(message);
   }
 
-  public boolean isRunning() {
-    return this.running;
-  }
-
-  public boolean getRunning() {
-    return this.running;
-  }
-
-  public void setRunning(boolean running) {
-    this.running = running;
-  }
-
-  public Socket getSocket() {
-    return this.socket;
-  }
-
-  public void setSocket(Socket socket) {
-    this.socket = socket;
-  }
-
-  public BufferedReader getIn() {
-    return this.in;
-  }
-
-  public void setIn(BufferedReader in) {
-    this.in = in;
-  }
-
-  public PrintWriter getOut() {
-    return this.out;
-  }
-
-  public void setOut(PrintWriter out) {
-    this.out = out;
-  }
-
   public String getName() {
     return this.name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public List<MessageObserver> getObservers() {
-    return this.observers;
-  }
-
-  public void setObservers(List<MessageObserver> observers) {
-    this.observers = observers;
   }
 }

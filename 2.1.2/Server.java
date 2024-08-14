@@ -1,3 +1,5 @@
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -5,8 +7,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class Server implements MessageObserver {
 
@@ -16,16 +16,18 @@ public class Server implements MessageObserver {
   GUI gui = null;
   private boolean listening = true;
 
-  volatile List<ClientHandler> clients = new ArrayList<ClientHandler>();
+  List<ClientHandler> clients = new ArrayList<ClientHandler>();
 
   private void listen() {
     while (listening) {
       try {
         Socket clientSocket = socket.accept();
         ClientHandler client = new ClientHandler(clientSocket);
-        new Thread(client).start();
-        clients.add(client);
         client.addObserver(this);
+        new Thread(client).start();
+        synchronized (clients) {
+          clients.add(client);
+        }
       } catch (IOException e) {
         System.err.println(e.getMessage());
       }
@@ -55,12 +57,14 @@ public class Server implements MessageObserver {
     }
 
     server.gui = new GUI();
+
     server.gui.addWindowListener(
       new WindowAdapter() {
         @Override
         public synchronized void windowClosing(WindowEvent e) {
           server.listening = false;
-          for (ClientHandler clientHandler : server.clients) {
+          List<ClientHandler> clientsCopy = new ArrayList<>(server.clients);
+          for (ClientHandler clientHandler : clientsCopy) {
             clientHandler.writeMessage("Server shutting down");
             clientHandler.closeConnections();
           }
@@ -86,16 +90,21 @@ public class Server implements MessageObserver {
     }
 
     new Thread(() -> server.listen()).start();
-    while (true) {
-      server.gui.setTitle(
-        "Host: " +
-        server.hostName +
-        ", port: " +
-        Integer.toString(server.port) +
-        ", connected clients: " +
-        server.clients.size()
-      );
-    }
+    new Thread(() -> {
+      while (server.listening) {
+        synchronized (server.clients) {
+          server.gui.setTitle(
+            "Host: " +
+            server.hostName +
+            ", port: " +
+            Integer.toString(server.port) +
+            ", connected clients: " +
+            server.clients.size()
+          );
+        }
+      }
+    })
+      .start();
   }
 
   @Override
