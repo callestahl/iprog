@@ -5,8 +5,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server implements MessageObserver {
 
@@ -16,7 +16,7 @@ public class Server implements MessageObserver {
   GUI gui = null;
   private boolean listening = true;
 
-  List<ClientHandler> clients = new ArrayList<ClientHandler>();
+  List<ClientHandler> clients = new CopyOnWriteArrayList<ClientHandler>();
 
   private void listen() {
     while (listening) {
@@ -63,8 +63,8 @@ public class Server implements MessageObserver {
         @Override
         public synchronized void windowClosing(WindowEvent e) {
           server.listening = false;
-          List<ClientHandler> clientsCopy = new ArrayList<>(server.clients);
-          for (ClientHandler clientHandler : clientsCopy) {
+          //List<ClientHandler> clientsCopy = new ArrayList<>(server.clients);
+          for (ClientHandler clientHandler : server.clients) {
             clientHandler.writeMessage("Server shutting down");
             clientHandler.closeConnections();
           }

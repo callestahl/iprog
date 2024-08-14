@@ -5,8 +5,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientHandler implements Runnable, MessageObservable {
 
@@ -16,7 +16,7 @@ public class ClientHandler implements Runnable, MessageObservable {
   private PrintWriter out = null;
   private String name = null;
 
-  List<MessageObserver> observers = new ArrayList<MessageObserver>();
+  private List<MessageObserver> observers = new CopyOnWriteArrayList<MessageObserver>();
 
   public ClientHandler(Socket socket) {
     this.socket = socket;
