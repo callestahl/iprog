@@ -1,5 +1,12 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.*;
 import javax.swing.*;
 
@@ -9,7 +16,8 @@ public class Draw extends JFrame implements AddPointCallback {
   private Paper paper;
   private int myPort;
   private int remotePort;
-  private String remoteHost;
+  InetAddress remoteHostAddress;
+  DatagramSocket socket;
 
   public static void main(String[] args) {
     if (args.length != 3) {
@@ -29,7 +37,21 @@ public class Draw extends JFrame implements AddPointCallback {
       System.err.println("could not parse remotePort");
       System.exit(1);
     }
-    draw.remoteHost = args[1];
+    try {
+      draw.remoteHostAddress = InetAddress.getByName(args[1]);
+    } catch (UnknownHostException e) {
+      System.err.println(e.getMessage());
+      System.exit(1);
+    }
+
+    try {
+      draw.socket = new DatagramSocket(draw.myPort);
+    } catch (SocketException e) {
+      System.err.println(e.getMessage());
+      System.exit(1);
+    }
+
+    draw.listen();
   }
 
   public Draw() {
@@ -42,11 +64,49 @@ public class Draw extends JFrame implements AddPointCallback {
   }
 
   private void sendPacket(Point point) {
-
+    String pointString =
+      Double.toString(point.getX()) + "," + Double.toString(point.getY());
+    byte[] buffer;
+    try {
+      buffer = pointString.getBytes(("UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+      return;
+    }
+    DatagramPacket packet = new DatagramPacket(
+      buffer,
+      buffer.length,
+      remoteHostAddress,
+      remotePort
+    );
+    try {
+      socket.send(packet);
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+    }
   }
 
   private void listen() {
-
+    new Thread(() -> {
+      byte[] buffer = new byte[64];
+      while (true) {
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        try {
+          socket.receive(packet);
+          String pointString = new String(buffer, 0, buffer.length, "UTF-8");
+          String[] pointStrings = pointString.split(",");
+          try {
+            int x = (int) Double.parseDouble(pointStrings[0]);
+            int y = (int) Double.parseDouble(pointStrings[1]);
+            paper.remoteAddPoint(new Point(x, y));
+          } catch (NullPointerException | NumberFormatException e) {
+            System.err.println("Error parsing string: " + e.getMessage());
+          }
+        } catch (IOException e) {
+          System.err.println(e.getMessage());
+        }
+      }
+    })
+      .start();
   }
 
   @Override
@@ -56,6 +116,7 @@ public class Draw extends JFrame implements AddPointCallback {
 }
 
 class Paper extends JPanel {
+
   private HashSet<Point> hashSet = new HashSet<>();
   private AddPointCallback caller;
 
@@ -66,7 +127,7 @@ class Paper extends JPanel {
     addMouseMotionListener(new L2());
   }
 
-  public void paintComponent(Graphics graphics) {
+  public synchronized void paintComponent(Graphics graphics) {
     super.paintComponent(graphics);
     graphics.setColor(Color.black);
     Iterator<Point> i = hashSet.iterator();
@@ -76,19 +137,26 @@ class Paper extends JPanel {
     }
   }
 
-  private void addPoint(Point point) {
+  public synchronized void remoteAddPoint(Point point) {
+    hashSet.add(point);
+    repaint();
+  }
+
+  private synchronized void addPoint(Point point) {
     hashSet.add(point);
     repaint();
     caller.pointAdded(point);
   }
 
   class L1 extends MouseAdapter {
+
     public void mousePressed(MouseEvent mouseEvent) {
       addPoint(mouseEvent.getPoint());
     }
   }
 
   class L2 extends MouseMotionAdapter {
+
     public void mouseDragged(MouseEvent mouseEvent) {
       addPoint(mouseEvent.getPoint());
     }
