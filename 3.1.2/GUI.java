@@ -56,10 +56,6 @@ public class GUI extends JFrame {
     add(gridPanel, BorderLayout.NORTH);
     add(inputPanel, BorderLayout.SOUTH);
 
-    listModel.addElement(
-      "<html>namegsdgdgs<br>bbkdkbdfjbdjfbfj<br>sdggsgsddg</html>"
-    );
-
     addButton.addActionListener(
       new ActionListener() {
         @Override
@@ -98,6 +94,13 @@ public class GUI extends JFrame {
     homepageField.setText("");
     commentField.setText("");
   }
-}
 
-class DataBaseEntry {}
+
+
+  public void updateEntries(List<DataBaseEntry> allGuestbookEntries) {
+    listModel.clear();
+    for (DataBaseEntry dataBaseEntry : allGuestbookEntries) {
+      listModel.addElement(dataBaseEntry.toString());
+    }
+  }
+}

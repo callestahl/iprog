@@ -1,8 +1,12 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SQLGuestbook implements InsertGuestbookEntryListener {
 
@@ -51,6 +55,8 @@ public class SQLGuestbook implements InsertGuestbookEntryListener {
     } catch (SQLException e) {
       System.err.println(e.getMessage());
     }
+
+    guestbook.gui.updateEntries(guestbook.getAllGuestbookEntries());
   }
 
   public void insertGuestbookEntry(
@@ -70,6 +76,7 @@ public class SQLGuestbook implements InsertGuestbookEntryListener {
       statement.setString(3, removeHtml(homepage));
       statement.setString(4, removeHtml(comment));
       statement.executeUpdate();
+      gui.updateEntries(getAllGuestbookEntries());
     } catch (SQLException e) {
       System.err.println(e.getMessage());
     }
@@ -77,5 +84,35 @@ public class SQLGuestbook implements InsertGuestbookEntryListener {
 
   private String removeHtml(String input) {
     return input.replaceAll("<.*>", "censur");
+  }
+
+  public List<DataBaseEntry> getAllGuestbookEntries() {
+    List<DataBaseEntry> entries = new ArrayList<>();
+    String query = "SELECT * FROM guestbook";
+    try (
+      Statement statement = connection.createStatement();
+      ResultSet resultSet = statement.executeQuery(query)
+    ) {
+      while (resultSet.next()) {
+        int id = resultSet.getInt("id");
+        String name = resultSet.getString("name");
+        String email = resultSet.getString("email");
+        String homepage = resultSet.getString("homepage");
+        String comment = resultSet.getString("comment");
+        Timestamp time = resultSet.getTimestamp("time");
+        DataBaseEntry entry = new DataBaseEntry(
+          id,
+          name,
+          email,
+          homepage,
+          comment,
+          time
+        );
+        entries.add(entry);
+      }
+    } catch (SQLException e) {
+      System.err.println(e.getMessage());
+    }
+    return entries;
   }
 }
