@@ -14,8 +14,10 @@ public class GUI extends JFrame {
   private JTextField homepageField;
   private JTextField commentField;
   private JButton addButton;
+  private InsertGuestbookEntryListener listener;
 
-  public GUI() {
+  public GUI(InsertGuestbookEntryListener listener) {
+    this.listener = listener;
     setSize(400, 400);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLayout(new BorderLayout());
@@ -54,16 +56,47 @@ public class GUI extends JFrame {
     add(gridPanel, BorderLayout.NORTH);
     add(inputPanel, BorderLayout.SOUTH);
 
-    listModel.addElement("<html>namegsdgdgs<br>bbkdkbdfjbdjfbfj<br>sdggsgsddg</html>");
+    listModel.addElement(
+      "<html>namegsdgdgs<br>bbkdkbdfjbdjfbfj<br>sdggsgsddg</html>"
+    );
 
     addButton.addActionListener(
       new ActionListener() {
         @Override
-        public void actionPerformed(ActionEvent e) {}
+        public void actionPerformed(ActionEvent e) {
+          if (noFieldBlank()) {
+            listener.insertGuestbookEntry(
+              nameField.getText(),
+              emailField.getText(),
+              homepageField.getText(),
+              commentField.getText()
+            );
+            clearFields();
+
+          }
+        }
       }
     );
 
     setVisible(true);
+  }
+
+
+
+  private boolean noFieldBlank() {
+    return (
+      !nameField.getText().isBlank() &&
+      !emailField.getText().isBlank() &&
+      !homepageField.getText().isBlank() &&
+      !commentField.getText().isBlank()
+    );
+  }
+
+  private void clearFields() {
+    nameField.setText("");
+    emailField.setText("");
+    homepageField.setText("");
+    commentField.setText("");
   }
 }
 

@@ -11,7 +11,7 @@ import java.util.*;
 import javax.swing.*;
 
 // baserat på exemplet från uppgiftsbeskkrivningen
-public class Draw extends JFrame implements AddPointCallback {
+public class Draw extends JFrame implements AddPointListener {
 
   private Paper paper;
   private int myPort;
@@ -118,10 +118,10 @@ public class Draw extends JFrame implements AddPointCallback {
 class Paper extends JPanel {
 
   private HashSet<Point> hashSet = new HashSet<>();
-  private AddPointCallback caller;
+  private AddPointListener listener;
 
-  public Paper(AddPointCallback caller) {
-    this.caller = caller;
+  public Paper(AddPointListener caller) {
+    this.listener = caller;
     setBackground(Color.white);
     addMouseListener(new L1());
     addMouseMotionListener(new L2());
@@ -145,7 +145,7 @@ class Paper extends JPanel {
   private synchronized void addPoint(Point point) {
     hashSet.add(point);
     repaint();
-    caller.pointAdded(point);
+    listener.pointAdded(point);
   }
 
   class L1 extends MouseAdapter {

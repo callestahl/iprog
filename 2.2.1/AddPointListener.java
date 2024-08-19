@@ -1,5 +1,5 @@
 import java.awt.*;
 
-public interface AddPointCallback {
+public interface AddPointListener {
   public void pointAdded(Point point);
 }
