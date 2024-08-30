@@ -1,12 +1,25 @@
 #include <Arduino.h>
 
-constexpr uint8_t PIN = 23;
+#include "Joystick.hpp"
+#include "VibrationSensor.hpp"
 
-void setup() { pinMode(PIN, OUTPUT); }
+// Pin numbers
+constexpr uint8_t JOYSTICK_X_PIN = 15;
+constexpr uint8_t JOYSTICK_Y_PIN = 13;
+constexpr uint8_t JOYSTICK_SWITCH_PIN = 4;
+constexpr uint8_t VIBRATION_SENSOR_PIN = 23;
+
+Joystick joystick(JOYSTICK_X_PIN, JOYSTICK_Y_PIN, JOYSTICK_SWITCH_PIN);
+VibrationSensor vibrationSensor(VIBRATION_SENSOR_PIN, 200);
+
+void setup() {
+  pinMode(VIBRATION_SENSOR_PIN, INPUT_PULLDOWN);
+
+  Serial.begin(9600);
+}
 
 void loop() {
-  digitalWrite(PIN, HIGH);
-  sleep(1);
-  digitalWrite(PIN, LOW);
-  sleep(1);
+  if (vibrationSensor.read()) {
+    Serial.println(joystick.readVoltage());
+  }
 }
