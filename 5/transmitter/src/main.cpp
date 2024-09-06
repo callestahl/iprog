@@ -5,9 +5,9 @@
 #include "Transmitter.hpp"
 
 // Pin numbers
-constexpr uint8_t JOYSTICK_X_PIN = 15;
-constexpr uint8_t JOYSTICK_Y_PIN = 13;
-constexpr uint8_t JOYSTICK_SWITCH_PIN = 4;
+constexpr uint8_t JOYSTICK_X_PIN = 34;
+constexpr uint8_t JOYSTICK_Y_PIN = 35;
+constexpr uint8_t JOYSTICK_SWITCH_PIN = 12;
 constexpr uint8_t VIBRATION_SENSOR_PIN = 23;
 
 Joystick joystick(JOYSTICK_X_PIN, JOYSTICK_Y_PIN, JOYSTICK_SWITCH_PIN);
