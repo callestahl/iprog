@@ -25,9 +25,9 @@ float Receiver::receiveData() {
 
   int packetSize = udp.parsePacket();
   if (packetSize) {
-    int len = udp.read(incomingPacket, 255);
-    if (len > 0) {
-      if (len == sizeof(float)) {
+    int length = udp.read(incomingPacket, 255);
+    if (length > 0) {
+      if (length == sizeof(float)) {
         float receivedValue;
         memcpy(&receivedValue, incomingPacket, sizeof(float));
         return receivedValue;
