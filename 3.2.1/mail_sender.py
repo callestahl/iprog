@@ -4,7 +4,30 @@ import smtplib
 
 
 class MailSender:
+    """
+    a class to send emails
+    """
+
     def __init__(self, host: str, port: int, sender_address: str, password: str, receiver_address: str, subject: str, message: str) -> None:
+        """
+        constructs the MailSender object
+
+        Parameters:
+        host : str
+            the server host
+        port : int
+            the server port
+        sender_address : str
+            the senders email address
+        password : str
+            the senders password
+        receiver_address : str
+            the receivers email address
+        subject : str
+            the subject of the email
+        message : str
+            the message of the email
+        """
         self.host = host
         self.port = port
         self.sender_address = sender_address
@@ -14,6 +37,13 @@ class MailSender:
         self.message = message
 
     def send_mail(self, use_ssl: bool):
+        """
+        sends an email
+
+        Parameters:
+        use_ssl : bool
+            if True use SSL to connect to the server. otherwise use TLS
+        """
         message = MIMEText(self.message)
         message['Subject'] = self.subject
         message['From'] = self.sender_address
@@ -31,6 +61,10 @@ class MailSender:
 
 
 if __name__ == '__main__':
+    """
+    main entry point. parses command line arguments and sends an email
+    """
+    # handle command line arguments
     if len(sys.argv) != 8:
         print('Wrong number of arguments: <host> <port> <username> <password> <to> <subject> <message>')
         sys.exit(1)
@@ -41,13 +75,13 @@ if __name__ == '__main__':
     except ValueError:
         print('error parsing port number')
         sys.exit(1)
-
     sender_address = sys.argv[3]
     password = sys.argv[4]
     receiver_address = sys.argv[5]
     subject = sys.argv[6]
     message = sys.argv[7]
 
+    # construct the MailSender object, try to send with TLS. if that fails try to send with SSL
     mail_sender = MailSender(host, port, sender_address,
                              password, receiver_address, subject, message)
     try:

@@ -8,6 +8,10 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * class that implements a server that listens for client connections,
+ * handles messages from clients, and updates a GUI with the current status
+ */
 public class Server implements MessageObserver {
 
   private int port = 2000;
@@ -16,8 +20,12 @@ public class Server implements MessageObserver {
   GUI gui = null;
   private boolean listening = true;
 
+  // thread safe list of objects that control the connections to clients
   List<ClientHandler> clients = new CopyOnWriteArrayList<ClientHandler>();
 
+  /**
+   * listens for incoming client connections and starts a new thread for each client.
+   */
   private void listen() {
     while (listening) {
       try {
@@ -34,9 +42,15 @@ public class Server implements MessageObserver {
     }
   }
 
+  /**
+   * The main method to start the server.
+   *
+   * @param args Command line arguments to specify the port number.
+   */
   public static void main(String[] args) {
     Server server = new Server();
 
+    // handle command line arguments
     if (args.length == 1) {
       try {
         server.port = Integer.parseInt(args[0]);
@@ -49,6 +63,7 @@ public class Server implements MessageObserver {
       System.exit(1);
     }
 
+    // initialize the server socket
     try {
       server.socket = new ServerSocket(server.port);
     } catch (IOException e) {
@@ -56,8 +71,10 @@ public class Server implements MessageObserver {
       System.exit(1);
     }
 
+    // create the GUI
     server.gui = new GUI();
 
+    // handle window closing and close connections
     server.gui.addWindowListener(
       new WindowAdapter() {
         @Override
@@ -76,6 +93,7 @@ public class Server implements MessageObserver {
         }
       }
     );
+
     try {
       InetAddress.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
@@ -83,13 +101,17 @@ public class Server implements MessageObserver {
       System.exit(1);
     }
 
+    // set the hostname of the server
     try {
       server.hostName = InetAddress.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
       System.err.println(e.getMessage());
     }
 
+    // listen to connections
     new Thread(() -> server.listen()).start();
+
+    // update title of GUI
     new Thread(() -> {
       while (server.listening) {
         synchronized (server.clients) {
@@ -109,9 +131,11 @@ public class Server implements MessageObserver {
 
   @Override
   public synchronized void messageSent(ClientHandlerMessage message) {
+    // remove the client if it has disconnected
     if (message.getMessageType() == MessageType.DISCONNECTED) {
       clients.remove(message.getSender());
     }
+    // update GUI and clients about message
     gui.addMessage(message.getSender().getName() + ": " + message.getMessage());
     for (ClientHandler clientHandler : clients) {
       clientHandler.writeMessage(

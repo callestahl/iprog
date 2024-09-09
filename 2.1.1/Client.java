@@ -9,6 +9,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+/**
+ * Client class that connects to a server, sends messages, and receives responses.
+ * Implements the MessageObserver interface to handle sent messages.
+ */
 public class Client implements MessageObserver {
 
   private String host = "127.0.0.1";
@@ -18,8 +22,15 @@ public class Client implements MessageObserver {
   private BufferedReader in = null;
   GUI gui = null;
 
+  /**
+   * Main method to start the client.
+   *
+   * @param args command line arguments for host and port.
+   */
   public static void main(String[] args) {
-    ClientHandler client = new ClientHandler();
+    Client client = new Client();
+    
+    // handle command line arguments
     switch (args.length) {
       case 0 -> {}
       case 1 -> client.host = args[0];
@@ -38,6 +49,7 @@ public class Client implements MessageObserver {
       }
     }
 
+    // connect to the server
     try {
       client.socket = new Socket(client.host, client.port);
     } catch (UnknownHostException e) {
@@ -54,6 +66,7 @@ public class Client implements MessageObserver {
       System.exit(1);
     }
 
+    // input stream
     try {
       client.in =
         new BufferedReader(
@@ -64,6 +77,7 @@ public class Client implements MessageObserver {
       System.exit(1);
     }
 
+    // output stream
     try {
       client.out =
         new PrintWriter(
@@ -78,6 +92,7 @@ public class Client implements MessageObserver {
       System.exit(1);
     }
 
+    // set up the GUI
     client.gui = new GUI();
     client.gui.setTitle(
       "Connected to host " +
@@ -87,6 +102,7 @@ public class Client implements MessageObserver {
     );
     client.gui.addObserver(client);
 
+    // listen to incoming messages
     new Thread(() -> {
       while (true) {
         String message = null;
@@ -100,6 +116,7 @@ public class Client implements MessageObserver {
     })
       .start();
 
+    // handle window closing
     client.gui.addWindowListener(
       new WindowAdapter() {
         @Override

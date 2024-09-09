@@ -4,7 +4,6 @@
 #include "VibrationSensor.hpp"
 #include "Transmitter.hpp"
 
-// Pin numbers
 constexpr uint8_t JOYSTICK_X_PIN = 34;
 constexpr uint8_t JOYSTICK_Y_PIN = 35;
 constexpr uint8_t JOYSTICK_SWITCH_PIN = 12;
@@ -15,8 +14,6 @@ VibrationSensor vibrationSensor(VIBRATION_SENSOR_PIN, 200);
 Transmitter transmitter;
 
 void setup() {
-  pinMode(VIBRATION_SENSOR_PIN, INPUT_PULLDOWN);
-
   Serial.begin(9600);
   transmitter.connectToWifi();
 }

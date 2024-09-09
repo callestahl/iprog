@@ -11,17 +11,17 @@ void Receiver::connectToWifi() {
   }
 
   Serial.println("");
-  Serial.println("WiFi connected.");
+  Serial.println("Wifi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
   udp.begin(port);
-  Serial.print("Listening on UDP port ");
+  Serial.print("Listening on port ");
   Serial.println(port);
 }
 
 float Receiver::receiveData() {
-  byte incomingPacket[255];
+  uint8_t incomingPacket[255];
 
   int packetSize = udp.parsePacket();
   if (packetSize) {
