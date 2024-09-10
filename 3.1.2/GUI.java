@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
+/**
+ * represents the graphical user interface for the guestbook application
+ */
 public class GUI extends JFrame {
 
   private DefaultListModel<String> listModel;
@@ -16,6 +19,11 @@ public class GUI extends JFrame {
   private JButton addButton;
   private InsertGuestbookEntryListener listener;
 
+  /**
+   * Constructs a new GUI and adds listener
+   *
+   * @param listener the listener for inserting guestbook entries
+   */
   public GUI(InsertGuestbookEntryListener listener) {
     this.listener = listener;
     setSize(400, 400);
@@ -33,6 +41,7 @@ public class GUI extends JFrame {
     JPanel gridPanel = new JPanel();
     gridPanel.setLayout(new GridLayout(5, 2));
 
+    // input fields
     gridPanel.add(new JLabel("Name:"));
     nameField = new JTextField();
     gridPanel.add(nameField);
@@ -49,6 +58,7 @@ public class GUI extends JFrame {
     commentField = new JTextField();
     gridPanel.add(commentField);
 
+    // button
     gridPanel.add(new JLabel("Add:"));
     addButton = new JButton("Add");
     gridPanel.add(addButton);
@@ -56,6 +66,7 @@ public class GUI extends JFrame {
     add(gridPanel, BorderLayout.NORTH);
     add(inputPanel, BorderLayout.SOUTH);
 
+    // handle press on add button by notifying main program
     addButton.addActionListener(
       new ActionListener() {
         @Override
@@ -68,7 +79,6 @@ public class GUI extends JFrame {
               commentField.getText()
             );
             clearFields();
-
           }
         }
       }
@@ -77,8 +87,11 @@ public class GUI extends JFrame {
     setVisible(true);
   }
 
-
-
+  /**
+   * checks if any of the input fields name, email, homepage or comment are blank
+   *
+   * @return true if none of the input fields are blank, false otherwise
+   */
   private boolean noFieldBlank() {
     return (
       !nameField.getText().isBlank() &&
@@ -88,6 +101,9 @@ public class GUI extends JFrame {
     );
   }
 
+  /**
+   * clears the text in all input fields name, email, homepage and comment
+   */
   private void clearFields() {
     nameField.setText("");
     emailField.setText("");
@@ -95,10 +111,15 @@ public class GUI extends JFrame {
     commentField.setText("");
   }
 
-
-
+  /**
+   * updates the list model with all guestbook entries
+   *
+   * @param allGuestbookEntries the list of all guestbook entries to be displayed
+   */
   public void updateEntries(List<DataBaseEntry> allGuestbookEntries) {
+    // clear old entries
     listModel.clear();
+    // add new entries
     for (DataBaseEntry dataBaseEntry : allGuestbookEntries) {
       listModel.addElement(dataBaseEntry.toString());
     }

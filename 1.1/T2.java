@@ -6,8 +6,8 @@ public class T2 implements Runnable {
   private volatile boolean shouldStop = false;
 
   /**
-   * The run method is called when the Runnable is used to create a Thread and the
-   * thread is started.
+   * The run method is called when the Runnable is used to create a Thread 
+   * and the thread is started.
    * It enters a loop where it prints "Tråd 2" and sleeps for 1 second.
    * The loop continues until the stop method is called on this T2 object.
    */

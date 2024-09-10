@@ -24,7 +24,8 @@ public class Server implements MessageObserver {
   List<ClientHandler> clients = new CopyOnWriteArrayList<ClientHandler>();
 
   /**
-   * listens for incoming client connections and starts a new thread for each client.
+   * listens for incoming client connections and starts a new thread for each
+   * client.
    */
   private void listen() {
     while (listening) {

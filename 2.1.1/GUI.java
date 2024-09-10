@@ -7,7 +7,8 @@ import javax.swing.*;
 
 /**
  * GUI class that represents a simple chat client.
- * Implements the MessageObservable interface to notify Client when a message is sent.
+ * Implements the MessageObservable interface to notify Client when a message 
+ * is sent.
  */
 public class GUI extends JFrame implements MessageObservable {
 

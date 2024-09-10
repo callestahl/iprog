@@ -58,7 +58,8 @@ public class ClientHandler implements Runnable, MessageObservable {
 
   /**
    * closes the connections to the client
-   * this method stops the handler, closes the input and output streams, and the socket
+   * this method stops the handler, closes the input and output streams, and the 
+   * socket
    */
   public void closeConnections() {
     running = false;
